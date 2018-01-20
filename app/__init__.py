@@ -8,7 +8,7 @@ app.config.from_object('config')
 try:
     # try to load config from instance directory
     app.config.from_pyfile('config.py')
-except app.config.from_pyfile('config.py'):
+except FileNotFoundError:
     print('instance/config.py does not exist')
 
 
