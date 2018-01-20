@@ -5,7 +5,12 @@ from flask_migrate import Migrate
 app = Flask(__name__, instance_relative_config=True)
 
 app.config.from_object('config')
-app.config.from_pyfile('config.py')
+try:
+    # try to load config from instance directory
+    app.config.from_pyfile('config.py')
+except app.config.from_pyfile('config.py'):
+    print('instance/config.py does not exist')
+
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
