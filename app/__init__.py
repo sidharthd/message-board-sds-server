@@ -11,6 +11,9 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 from .models import *
 
+from .views.api_1 import api_1
+app.register_blueprint(api_1, url_prefix = '/api/1')
+
 @app.route('/')
 def index():
     return 'Hello!'
