@@ -35,9 +35,6 @@ def newTweet():
         if author == '':
             author = 'Anonymous'
 
-    # tweet = request.json['tweet']
-    # author = 'Anon'
-
     # create a database record object
     _tweet = Tweet(tweet, author)
     db.session.add(_tweet)
