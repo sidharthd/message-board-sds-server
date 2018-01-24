@@ -1,7 +1,6 @@
 from . import db
 
 class Tweet(db.Model):
-
     id = db.Column(db.Integer, primary_key = True)
     tweet = db.Column(db.String(140), nullable = False)
     author = db.Column(db.String(20), nullable = False)

@@ -13,7 +13,15 @@ def index():
 
 @api_1.route('/tweets/')
 def getTweets():
-    return 'JSON of all tweets'
+    tweets = [
+        {
+            'key': tweet.id,
+            'tweet': tweet.tweet,
+            'author': tweet.author
+        }
+        for tweet in Tweet.query.all()
+    ]
+    return json.dumps({'tweets': tweets})
 
 @api_1.route('/tweet/<int:tweetId>')
 def getTweet(tweetId):
