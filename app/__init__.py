@@ -2,10 +2,12 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_socketio import SocketIO, send, emit
+from flask_bcrypt import Bcrypt
 
 app = Flask(__name__, instance_relative_config=True)
 app.config['SECRET_KEY'] = 'secret!'
 socket = SocketIO(app)
+bcrypt = Bcrypt(app)
 
 app.config.from_object('config')
 try:

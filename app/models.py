@@ -1,4 +1,16 @@
-from . import db
+from . import db, bcrypt
+from sqlalchemy.ext.hybrid import hybrid_property
+
+class Account(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(30), nullable = False)
+    email = db.Column(db.String(50), nullable = False, unique = True)
+    password = db.Column(db.String(128), nullable = False)
+
+    def __init__(self, name, email, password):
+        self.name = name
+        self.email = email
+        self.password = password
 
 class Tweet(db.Model):
     id = db.Column(db.Integer, primary_key = True)

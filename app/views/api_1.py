@@ -1,15 +1,51 @@
 from flask import Blueprint, request
 import json
 import re
+from sqlalchemy.exc import IntegrityError
 
 api_1 = Blueprint('api_v1', __name__)
 
-from .. import db
-from ..models import Tweet, Comment
+from .. import db, socket, bcrypt
+from ..models import Tweet, Comment, Account
 
 @api_1.route('/')
 def index():
     return 'API 1'
+
+@api_1.route('/login/', methods = ['POST'])
+def login():
+    email = request.json['email']
+    password = request.json['password']
+    hash = bcrypt.generate_password_hash(password).decode('utf-8')
+    account = Account.query.filter_by(email = email).first()
+    if account:
+        if bcrypt.check_password_hash(account.password, password):
+            return json.dumps({'result' : 'success'})
+        else:
+            return json.dumps({'result' : 'failure'})
+    else:
+        return json.dumps({'result' : 'failure'})
+
+@api_1.route('/signup/', methods = ['POST'])
+def signup():
+    name = request.json['name']
+    email = request.json['email']
+    password = request.json['password']
+    hash = bcrypt.generate_password_hash(password).decode('utf-8')
+    try:
+        account = Account(
+            name = name,
+            email = email,
+            password = hash
+        )
+        db.session.add(account)
+        db.session.commit()
+    except IntegrityError:
+        return json.dumps({
+            'result': 'failure',
+            'error': 'email'
+        })
+    return json.dumps({'result' : 'success'})
 
 @api_1.route('/tweets/')
 def getTweets():
@@ -48,4 +84,12 @@ def newTweet():
     db.session.add(_tweet)
     db.session.commit()
 
-    return json.dumps({'result': 'success'})
+    # create a dictionary to be broadcasted to all connected clients
+    tweet = {
+        'key': _tweet.id,
+        'tweet': _tweet.tweet,
+        'author': _tweet.author
+    }
+
+    socket.emit('new tweet', tweet, broadcast = True)
+    return json.dumps({'tweet': tweet})
